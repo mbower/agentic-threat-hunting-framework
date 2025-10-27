@@ -6,9 +6,70 @@
 
 **Give your threat hunting program memory and agency.**
 
-ATHR is a framework for building threat hunting systems that remember past investigations, learn from outcomes, and decide autonomously. It provides structure for progressing from manual hunting to AI-coordinated operations.
+ATHR is a framework for building threat hunting systems that remember past investigations, learn from outcomes, and augment human decision-making. It provides structure for progressing from manual hunting to AI-coordinated operations.
 
 **Use it standalone, or layer it over PEAK, SQRRL, or your existing methodology.**
+
+## Why ATHR?
+
+**The Problem:**
+Existing threat hunting frameworks (PEAK, SQRRL, TaHiTI) teach you *how to hunt*, but not *how to give your hunting program persistent memory and AI augmentation*.
+
+Without structure for memory and agents:
+- Hunters have foggy memory of past hunts (remember something similar, but not the details)
+- AI assistance is ad-hoc (copy/paste to ChatGPT with no context)
+- Lessons learned stay in people's heads (knowledge loss when hunters leave)
+- Scaling requires more hunters (limited path to augmentation)
+
+**ATHR's Solution:**
+A framework specifically for building **agentic capability** in threat hunting:
+
+1. **Memory by Design** - Architecture for recall (grep → structured → weighted)
+2. **AI Integration Patterns** - From prompts to agents to learning systems
+3. **Maturity Progression** - Pragmatic path from manual to autonomous
+4. **Universal Structure** - LOCK pattern works across methodologies
+
+**What Makes ATHR Different:**
+
+ATHR is a parallel framework with a different concern than existing hunting frameworks:
+
+| Framework | Focus | Answers | Complements ATHR? |
+|-----------|-------|---------|-------------------|
+| **PEAK** | Hunting process (Prepare → Execute → Act) | "How should teams hunt systematically?" | ✅ Yes - ATHR adds memory + agents |
+| **SQRRL** | Hypothesis-driven operations | "How do we validate threat hypotheses?" | ✅ Yes - ATHR structures for AI parsing |
+| **TaHiTI** | Team coordination & collaboration | "How do hunt teams work together?" | ✅ Yes - ATHR adds agent automation |
+| **ATHR** | Agentic capability (Manual → AI-augmented) | "How do we make hunting remember and learn?" | Standalone or layered |
+
+**In short:**
+- **PEAK/SQRRL/TaHiTI**: *Process frameworks* (how humans hunt)
+- **ATHR**: *Capability framework* (how systems become agentic)
+
+**ATHR is the only framework focused on making threat hunting agentic.**
+
+## What ATHR Is
+
+ATHR is both a **conceptual framework** and a **practical toolkit** for agentic threat hunting - building systems that can remember, learn, and augment human decision-making.
+
+**Core Components:**
+
+1. **LOCK Pattern** - Universal structure for documenting hunts in AI-readable format
+2. **Memory Architecture** - From simple grep to weighted learning systems
+3. **5 Levels of Agentic Hunting** - Maturity model from manual to AI-augmented operations
+4. **Templates & Patterns** - Practical implementations you can copy
+
+**Scope:**
+- **PEAK/SQRRL/TaHiTI**: Frameworks for *how humans hunt* (process, phases, methodology)
+- **ATHR**: Framework for *how systems become agentic* (memory, learning, augmentation)
+
+**Relationship:**
+- **Standalone**: Use ATHR's LOCK pattern and maturity model to build agentic capability from scratch
+- **Layered**: Apply ATHR's memory and agent patterns to your existing PEAK/SQRRL workflow
+
+**Technical Foundation:**
+- **Storage**: Markdown files in git repos (or SharePoint, Confluence, Jira, folders)
+- **Infrastructure**: Git workflows, CI/CD pipelines for agent deployment
+- **AI Integration**: ChatGPT, Claude, Copilot, custom agents, LangChain, AutoGen
+- **SIEM Integration**: Works with any query language (SPL, KQL, EQL, YARA-L)
 
 ## The LOCK Pattern
 
@@ -31,60 +92,6 @@ LOCK isn't a new methodology—it's the **abstraction that makes threat hunting 
 
 By standardizing hunt notes around LOCK, AI can understand your hunts regardless of which framework you use.
 
-## Why ATHR?
-
-**The Problem:**
-Existing threat hunting frameworks (PEAK, SQRRL, TaHiTI) teach you *how to hunt*, but not *how to make hunting systems remember, learn, and act autonomously*.
-
-Without structure for memory and agents:
-- Hunters repeat investigations (no memory of past hunts)
-- AI assistance is ad-hoc (copy/paste to ChatGPT with no context)
-- Lessons learned stay in people's heads (knowledge loss when hunters leave)
-- Scaling requires more hunters (no path to automation)
-
-**ATHR's Solution:**
-A framework specifically for building **agentic capability** in threat hunting:
-
-1. **Memory by Design** - Architecture for recall (grep → structured → weighted)
-2. **AI Integration Patterns** - From prompts to agents to learning systems
-3. **Maturity Progression** - Pragmatic path from manual to autonomous
-4. **Universal Structure** - LOCK pattern works across methodologies
-
-**What Makes ATHR Different:**
-
-| What You Need | Use This Framework |
-|---------------|-------------------|
-| How to structure hunts for teams | **PEAK** (Prepare → Execute → Act) |
-| How to validate threat hypotheses | **SQRRL** (Hypothesis → Investigation → Detection) |
-| How to coordinate hunt teams | **TaHiTI** (Team hunting methodology) |
-| **How to add memory, AI, and agents** | **ATHR** (Manual → Autonomous) |
-
-**ATHR is the only framework focused on making threat hunting agentic.**
-
-## What ATHR Is
-
-ATHR is a **framework for agentic threat hunting** - building systems that can remember, learn, and act with increasing autonomy.
-
-**Core Components:**
-
-1. **LOCK Pattern** - Universal structure for documenting hunts in AI-readable format
-2. **Memory Architecture** - From simple grep to weighted learning systems
-3. **Maturity Model** - 5 levels from manual to adaptive autonomous operations
-4. **Templates & Patterns** - Practical implementations you can copy
-
-**Scope:**
-- **PEAK/SQRRL/TaHiTI**: Frameworks for *how humans hunt* (process, phases, methodology)
-- **ATHR**: Framework for *how systems become agentic* (memory, learning, autonomy)
-
-**Relationship:**
-- **Standalone**: Use ATHR's LOCK pattern and maturity model to build agentic capability from scratch
-- **Layered**: Apply ATHR's memory and agent patterns to your existing PEAK/SQRRL workflow
-
-**Technical Scope:**
-- **Works on**: Markdown files (git, SharePoint, Confluence, Jira, folders)
-- **Works with**: ChatGPT, Claude, Copilot, custom agents, LangChain, AutoGen
-- **Integrates with**: Any SIEM (Splunk, Sentinel, Elastic, Chronicle)
-
 ## The 5 Levels of Agentic Hunting
 
 | Level | Name | What Changes | Memory | Tools |
@@ -98,43 +105,33 @@ ATHR is a **framework for agentic threat hunting** - building systems that can r
 
 **Start at Level 0. Most teams operate at Level 2-3. Progress only when complexity demands it.**
 
-## Quick Start
+## Philosophy
 
-### 1. Install the Templates
+ATHR is a **framework for building agentic capability**, not a replacement for hunting methodologies.
 
-```bash
-git clone https://github.com/sydney-nebulock/agentic-threat-hunting-framework
-cd agentic-threat-hunting-framework
-```
+**ATHR's thesis:**
+Threat hunting becomes more effective when systems can:
+1. **Remember** - Recall past hunts to avoid duplication and apply lessons
+2. **Learn** - Identify patterns in what works and what doesn't
+3. **Decide** - Augment human decision-making with AI assistance on validated patterns
 
-Or download and copy to any storage (SharePoint, Confluence, Jira, folders).
+**How ATHR achieves this:**
+- **LOCK Pattern** - Standardizes hunt documentation for AI parsing
+- **Memory Design** - Scalable architecture from grep to weighted systems
+- **Maturity Levels** - Pragmatic progression path (don't over-engineer early)
+- **Agent Patterns** - Practical examples for single-agent → multi-agent → learning systems
 
-### 2. See the Example
+**Use ATHR when:**
+- You want AI to assist or augment hunting tasks
+- You need memory across hunts (avoid duplicates, apply lessons)
+- You're building toward agent-driven hunting operations
+- You want to make your hunting program learnable by machines
 
-Check `hunts/` for a complete hunt showing AI-assisted workflow:
-- **H-0001.md** - Hypothesis template with AI guidance
-- **H-0001_2025-10-22.md** - First execution
-- **H-0001_2025-10-29.md** - Refined execution using memory
+## Three Rules for Agentic Hunting
 
-### 3. Start at Your Level
-
-**Level 0-1: Use AI prompts**
-- Copy prompts from `prompts/` folder
-- Use with ChatGPT/Claude to draft hypotheses and queries
-- Still validate and run everything manually
-
-**Level 2: Add memory**
-- Save hunt notes in `hunts/` folder
-- Before each hunt: `grep -l "T1110" hunts/*.md` to check past hunts
-- Share past hunt context with your AI assistant
-
-**Level 3: Automate one task**
-- Build a script that checks memory before generating hypothesis
-- Or auto-fills execution reports from query results
-- Or suggests similar past hunts
-
-**Level 4-5: Agent orchestration**
-- See `docs/` for architecture patterns (coming soon)
+1. **Validate AI output** - Never run AI-generated queries without review
+2. **Build memory first** - Agents without memory repeat mistakes
+3. **Progress gradually** - Level 2 is better than Level 0, even if you never reach Level 5
 
 ## What You Get
 
@@ -221,8 +218,11 @@ Structure your hunt notes in LOCK format, and AI can understand your methodology
 1. Store hunt notes in `hunts/` folder (or Jira, Confluence, etc.)
 2. Before each hunt, grep for similar hunts:
    ```bash
-   grep -l "T1110.001" hunts/*.md  # Find by TTP
-   grep -i "brute force" hunts/*.md  # Find by behavior
+   grep -l "T1110.001" hunts/*.md        # Find by TTP
+   grep -i "brute force" hunts/*.md      # Find by behavior
+   grep -i "powershell" hunts/*.md       # Find by technology
+   grep -i "active directory" hunts/*.md # Find by application
+   grep -i "privilege escalation" hunts/*.md  # Find by keyword
    ```
 3. Include relevant past hunts in your AI prompt
 4. AI now has memory context when drafting
@@ -353,28 +353,6 @@ ATHR works with any SIEM that supports query languages:
 
 Templates are query-language agnostic. Agents can be trained on your SIEM's specific syntax.
 
-## Philosophy
-
-ATHR is a **framework for building agentic capability**, not a replacement for hunting methodologies.
-
-**ATHR's thesis:**
-Threat hunting becomes more effective when systems can:
-1. **Remember** - Recall past hunts to avoid duplication and apply lessons
-2. **Learn** - Identify patterns in what works and what doesn't
-3. **Decide** - Act autonomously on validated patterns with appropriate constraints
-
-**How ATHR achieves this:**
-- **LOCK Pattern** - Standardizes hunt documentation for AI parsing
-- **Memory Design** - Scalable architecture from grep to weighted systems
-- **Maturity Levels** - Pragmatic progression path (don't over-engineer early)
-- **Agent Patterns** - Practical examples for single-agent → multi-agent → learning systems
-
-**Use ATHR when:**
-- You want AI to assist or automate hunting tasks
-- You need memory across hunts (avoid duplicates, apply lessons)
-- You're building toward agent-driven hunting operations
-- You want to make your hunting program learnable by machines
-
 ## Three Rules for Agentic Hunting
 
 1. **Validate AI output** - Never run AI-generated queries without review
@@ -468,22 +446,6 @@ LOCK solves this by providing a universal structure. When you document hunts in 
 
 **LOCK is the API between human hunting frameworks and AI agents.**
 
-## Relationship to Existing Frameworks
-
-| Framework | Focus | Answers | Complements ATHR? |
-|-----------|-------|---------|-------------------|
-| **PEAK** | Hunting process (Prepare → Execute → Act) | "How should teams hunt systematically?" | ✅ Yes - ATHR adds memory + agents |
-| **SQRRL** | Hypothesis-driven operations | "How do we validate threat hypotheses?" | ✅ Yes - ATHR structures for AI parsing |
-| **TaHiTI** | Team coordination & collaboration | "How do hunt teams work together?" | ✅ Yes - ATHR adds agent automation |
-| **ATHR** | Agentic capability (Manual → Autonomous) | "How do we make hunting remember and learn?" | Standalone or layered |
-
-**ATHR is a parallel framework with a different concern:**
-- **PEAK/SQRRL/TaHiTI**: *Process frameworks* (how humans hunt)
-- **ATHR**: *Capability framework* (how systems become agentic)
-
-**Used together:** PEAK for your hunting process + ATHR for memory/automation
-**Used standalone:** ATHR's LOCK pattern is sufficient for simple operations
-
 ## FAQ
 
 **Q: Do I need to use your templates?**
@@ -504,6 +466,44 @@ No. ATHR provides:
 
 **Q: Where's the agent code?**
 Level 1-2 need no code (just prompts + grep). Level 3+ examples coming in `docs/` and `examples/`.
+
+## Quick Start
+
+### 1. Install the Templates
+
+```bash
+git clone https://github.com/sydney-nebulock/agentic-threat-hunting-framework
+cd agentic-threat-hunting-framework
+```
+
+Or download and copy to any storage (SharePoint, Confluence, Jira, folders).
+
+### 2. See the Example
+
+Check `hunts/` for a complete hunt showing AI-assisted workflow:
+- **H-0001.md** - Hypothesis template with AI guidance
+- **H-0001_2025-10-22.md** - First execution
+- **H-0001_2025-10-29.md** - Refined execution using memory
+
+### 3. Start at Your Level
+
+**Level 0-1: Use AI prompts**
+- Copy prompts from `prompts/` folder
+- Use with ChatGPT/Claude to draft hypotheses and queries
+- Still validate and run everything manually
+
+**Level 2: Add memory**
+- Save hunt notes in `hunts/` folder
+- Before each hunt: `grep -l "T1110" hunts/*.md` to check past hunts
+- Share past hunt context with your AI assistant
+
+**Level 3: Automate one task**
+- Build a script that checks memory before generating hypothesis
+- Or auto-fills execution reports from query results
+- Or suggests similar past hunts
+
+**Level 4-5: Agent orchestration**
+- See `docs/` for architecture patterns (coming soon)
 
 ## Questions?
 
