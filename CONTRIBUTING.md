@@ -7,7 +7,7 @@ ATHR is a **framework for building agentic capability** in threat hunting. This 
 ATHR teaches systems how to hunt with memory, learning, and augmentation. It's:
 
 - **Framework, not platform** - Structure over software, adapt to your environment
-- **Capability-focused** - Adds memory and agents to any hunting methodology (PEAK, SQRRL, custom)
+- **Capability-focused** - Adds memory and agents to any hunting methodology ([PEAK](https://www.splunk.com/en_us/blog/security/peak-threat-hunting-framework.html), [SQRRL](https://www.threathunting.net/files/The%20Threat%20Hunting%20Reference%20Model%20Part%202_%20The%20Hunting%20Loop%20_%20Sqrrl.pdf), custom)
 - **Progression-minded** - Start simple (grep + ChatGPT), scale when complexity demands it
 
 **Give your threat hunting program memory and agency.**
@@ -31,7 +31,7 @@ git init
 Use ATHR's LOCK pattern as your hunting methodology. Simple, lightweight, agentic-first.
 
 **Option B: Layered (ATHR + PEAK/SQRRL)**
-Keep your existing hunting framework (PEAK, SQRRL, TaHiTI) and use ATHR to add memory and AI agents.
+Keep your existing hunting framework ([PEAK](https://www.splunk.com/en_us/blog/security/peak-threat-hunting-framework.html), [SQRRL](https://www.threathunting.net/files/The%20Threat%20Hunting%20Reference%20Model%20Part%202_%20The%20Hunting%20Loop%20_%20Sqrrl.pdf), [TaHiTI](https://www.betaalvereniging.nl/en/safety/tahiti/)) and use ATHR to add memory and AI agents.
 
 **Why ATHR helps:**
 Without structured memory, hunters have foggy memory of past hunts—they remember something similar happened, but not the details. ATHR gives your program persistent memory and AI augmentation.
@@ -110,7 +110,7 @@ ATHR is designed to work with your existing stack. See the README sections for d
 
 ## Mapping ATHR to Your Existing Framework
 
-ATHR complements existing hunting frameworks (PEAK, SQRRL, TaHiTI) by adding memory and AI augmentation. You can use ATHR standalone or layer it over your current methodology.
+ATHR complements existing hunting frameworks ([PEAK](https://www.splunk.com/en_us/blog/security/peak-threat-hunting-framework.html), [SQRRL](https://www.threathunting.net/files/The%20Threat%20Hunting%20Reference%20Model%20Part%202_%20The%20Hunting%20Loop%20_%20Sqrrl.pdf), [TaHiTI](https://www.betaalvereniging.nl/en/safety/tahiti/)) by adding memory and AI augmentation. You can use ATHR standalone or layer it over your current methodology.
 
 **See the README section "How ATHR Works With Your Framework"** for detailed mapping tables showing:
 - How PEAK phases map to LOCK steps

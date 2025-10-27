@@ -8,12 +8,12 @@
 
 ATHR is a framework for building threat hunting systems that remember past investigations, learn from outcomes, and augment human decision-making. It provides structure for progressing from manual hunting to AI-coordinated operations.
 
-**Use it standalone, or layer it over PEAK, SQRRL, or your existing methodology.**
+**Use it standalone, or layer it over [PEAK](https://www.splunk.com/en_us/blog/security/peak-threat-hunting-framework.html), [SQRRL](https://www.threathunting.net/files/The%20Threat%20Hunting%20Reference%20Model%20Part%202_%20The%20Hunting%20Loop%20_%20Sqrrl.pdf), or your existing methodology.**
 
 ## Why ATHR?
 
 **The Problem:**
-Existing threat hunting frameworks (PEAK, SQRRL, TaHiTI) teach you *how to hunt*, but not *how to give your hunting program persistent memory and AI augmentation*.
+Existing threat hunting frameworks ([PEAK](https://www.splunk.com/en_us/blog/security/peak-threat-hunting-framework.html), [SQRRL](https://www.threathunting.net/files/The%20Threat%20Hunting%20Reference%20Model%20Part%202_%20The%20Hunting%20Loop%20_%20Sqrrl.pdf), [TaHiTI](https://www.betaalvereniging.nl/en/safety/tahiti/)) teach you *how to hunt*, but not *how to give your hunting program persistent memory and AI augmentation*.
 
 Without structure for memory and agents:
 - Hunters have foggy memory of past hunts (remember something similar, but not the details)
