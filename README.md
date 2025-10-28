@@ -287,6 +287,37 @@ ATHR templates structure your Prepare/Execute/Act phases in LOCK format so AI ag
    AI: *reads past hunts* "Adversaries may attempt..."
    ```
 
+**The Difference This Makes:**
+
+#### Level 1: Persistent - Manual (15-20 min)
+
+```mermaid
+graph LR
+    L1_Start[CTI Report] --> L1_Grep[Manual grep:<br/>T1003 LSASS]
+    L1_Grep --> L1_Read[Read 3 files<br/>manually]
+    L1_Read --> L1_Copy[Copy/paste to<br/>ChatGPT]
+    L1_Copy --> L1_Draft[Get hypothesis]
+    L1_Draft --> L1_File[Manually create<br/>hunt file]
+    L1_File --> L1_Query[Write query]
+    L1_Query --> L1_Time[⏱️ 15-20 min]
+
+    style L1_Time fill:#ffcccc,stroke:#ff0000
+```
+
+#### Level 2: Augmented - AI Partner (3-5 min)
+
+```mermaid
+graph LR
+    L2_Start[CTI Report] --> L2_Ask[Ask AI:<br/>What about LSASS?]
+    L2_Ask --> L2_Auto[AI auto-searches<br/>& summarizes]
+    L2_Auto --> L2_Gen[Ask: Generate<br/>hypothesis]
+    L2_Gen --> L2_Create[Ask: Create<br/>hunt file]
+    L2_Create --> L2_Query[Ask: Generate<br/>query]
+    L2_Query --> L2_Time[⏱️ 3-5 min]
+
+    style L2_Time fill:#ccffcc,stroke:#00ff00
+```
+
 **Win:** Stop manually grepping. AI becomes your memory interface.
 
 **Cost:** ~$10-20/month
