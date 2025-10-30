@@ -114,3 +114,87 @@ grep -i "privilege escalation" hunts/*.md  # Find by keyword
 ```
 
 This manual recall loop works at Level 1: Persistent. At Level 2: Augmented, AI tools do this automatically.
+
+## Using Environmental Context (environment.md, vulnerabilities.md)
+
+At **Level 2: Augmented**, incorporate environmental context into your workflow:
+
+### Before Planning a Hunt
+
+```bash
+# CVE alert: "Critical vulnerability in Nginx 1.21.x"
+
+# 1. Check if we run affected tech
+grep -i "nginx" environment.md
+# Result: Found "Nginx 1.21.6 on web-proxy-01 through web-proxy-05"
+
+# 2. Check if we've already hunted this
+grep -i "CVE-2024-1234" vulnerabilities.md
+# Result: Not found - this is new
+
+# 3. Check for similar past hunts
+grep -i "nginx" hunts/*.md
+grep -i "http smuggling" hunts/*.md
+# Result: H-0034 hunted similar web exploit patterns
+
+# 4. Use prompt with enriched context
+# Copy to AI: "We run Nginx 1.21.6. Past hunt H-0034 found X. Generate hypothesis for CVE-2024-1234..."
+```
+
+### Environment-Aware Hypothesis Generation
+
+When using **hypothesis-generator.md**, include environmental context:
+
+```
+Context: CVE-2024-1234 affects Nginx versions 1.20.0-1.22.1
+
+Our environment (from environment.md):
+- Nginx 1.21.6 on web-proxy-01 through web-proxy-05
+- Logs: web access logs in Splunk (index=web_proxy)
+- Network: Public-facing load balancers
+- WAF: Cloudflare in front of Nginx
+
+Past similar hunts:
+- H-0034: HTTP request smuggling hunt (found 2 attempts)
+
+Generate LOCK hypothesis for hunting CVE-2024-1234 exploitation attempts.
+```
+
+This provides AI with:
+- **Tech context** (what we run)
+- **Data context** (where to look)
+- **Historical context** (past lessons)
+
+### Level 3+ Automation Example
+
+At Level 3, this becomes automated:
+
+```python
+# CVE monitoring agent (runs daily)
+def check_new_cves():
+    new_cves = fetch_nvd_feed()
+
+    # Read tech stack
+    tech_stack = parse_environment_md()
+
+    for cve in new_cves:
+        # Check if CVE affects our environment
+        if cve.product in tech_stack:
+            # Check if we've hunted this
+            if not exists_in_vulnerabilities_md(cve.id):
+                # Check exploit availability
+                exploit = check_exploit_db(cve.id)
+
+                if exploit.public and cve.cvss >= 7.0:
+                    # Auto-add to vulnerabilities.md
+                    add_cve_entry(cve, tech_stack[cve.product])
+
+                    # Generate hunt suggestion
+                    past_hunts = grep_similar_hunts(cve.product)
+                    hypothesis = generate_hypothesis(cve, tech_stack, past_hunts)
+
+                    # Alert human
+                    notify_slack(f"New hunt opportunity: {cve.id}")
+```
+
+**Key insight:** environment.md + vulnerabilities.md enable vulnerability-driven hunting at scale.

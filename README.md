@@ -45,6 +45,23 @@ A framework specifically for building **agentic capability** in threat hunting:
 - **PEAK/SQRRL/TaHiTI**: *Process frameworks* (how humans hunt)
 - **ATHR**: *AI integration framework* (how to structure hunts for AI)
 
+## Prerequisites: Get the Basics Down First
+
+**ATHR is not a threat hunting 101 course.** You need to be actively hunting before this framework provides value.
+
+Before implementing ATHR, you should have:
+- **Access to security data** - SIEM, EDR, logs, or other telemetry sources
+- **Basic hunting skills** - Ability to form hypotheses and recognize adversary behavior
+- **Query capabilities** - Can write SPL, KQL, SQL, or use your platform's query language
+- **Active hunting practice** - Actually conducting hunts (even if ad-hoc or poorly documented)
+
+**If you're not hunting yet**, start with:
+- [PEAK Framework](https://www.splunk.com/en_us/blog/security/peak-threat-hunting-framework.html) for hunting process
+- [MITRE ATT&CK](https://attack.mitre.org/) for adversary TTPs
+- [Threat Hunting Project](https://www.threathunting.net/) for hunting fundamentals
+
+**ATHR assumes you're already hunting.** It helps you structure your existing hunting work for AI integration - it doesn't teach you *how* to hunt.
+
 ## What ATHR Is
 
 ATHR is both a **conceptual framework** and a **practical toolkit** for agentic threat hunting - building systems that can remember, learn, and augment human decision-making.
@@ -216,6 +233,36 @@ Real-world example showing:
 - Level 1-2: Persistent/Augmented - Grep-based memory (no additional tools)
 - Level 3+: Autonomous/Coordinated - When to add structured memory (JSON, SQLite)
 - Scaling guidance for 10, 50, 500+ hunts
+
+### Environmental Context (`environment.md`, `vulnerabilities.md`)
+Context files that inform hunt planning and enable automated vulnerability-driven hunting:
+
+**environment.md** - Tech stack inventory:
+- Security tools (SIEM, EDR, network monitoring)
+- Technology stack (languages, frameworks, databases, cloud platforms)
+- Internal documentation links (wikis, architecture diagrams, asset inventory)
+- Network architecture and infrastructure
+
+**vulnerabilities.md** - CVE tracking:
+- Known vulnerabilities affecting your environment
+- Exploit availability and active exploitation status
+- Hunt opportunities (CVEs that warrant proactive hunting)
+- Remediation tracking and status updates
+
+**How these support hunting:**
+- **Level 0-1**: Manual reference when planning hunts
+- **Level 2**: Grep across environment + past hunts to avoid duplicates and match CVEs to tech
+- **Level 3+**: Agents auto-match CVEs to tech stack, generate hunt suggestions when exploits emerge
+
+**Example Level 3 automation:**
+```
+CVE agent monitors feeds → Cross-references environment.md →
+Finds: CVE-2024-1234 affects Nginx 1.21.6 → Exploit published →
+Auto-generates hunt hypothesis in vulnerabilities.md →
+Human reviews and executes hunt
+```
+
+See files for detailed templates and integration examples.
 
 ## How ATHR Works With PEAK
 
@@ -515,7 +562,7 @@ No. ATHR provides:
 - Patterns for automation and multi-agent systems
 
 **Q: Where's the code?**
-Level 1-2: Persistent/Augmented need no code. Level 3+: Autonomous/Coordinated examples in [docs/scripting-examples.md](docs/scripting-examples.md).
+Level 1-2: Persistent/Augmented need no code. Most teams stop here.
 
 ## Quick Start
 
