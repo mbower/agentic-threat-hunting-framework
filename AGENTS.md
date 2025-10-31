@@ -120,6 +120,8 @@ AI: *reads vulnerabilities.md* "Based on open vulnerabilities:
 
 ## Hunting Methodology
 
+**Primary Framework:** [PEAK / TaHiTI]
+
 This repository follows the **LOCK pattern**:
 
 1. **Learn** - Gather context (CTI, alert, anomaly, vulnerability)

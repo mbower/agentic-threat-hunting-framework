@@ -79,29 +79,12 @@ ATHR is both a **conceptual framework** and a **practical toolkit** for agentic 
 
 ## Why LOCK?
 
-Existing threat hunting frameworks like PEAK teach you *how to hunt*. But they don't tell you how to structure your hunting knowledge for AI consumption.
-
-Attackers are using AI to get faster. Defenders need AI too. How do we do that?
-
-**Answer: Structure your hunt documentation so AI can read it.**
-
 LOCK (Learn → Observe → Check → Keep) is the AI-ready structure for threat hunting:
 
 - **Learn**: Gather context (CTI, alert, anomaly)
 - **Observe**: Form hypothesis about adversary behavior
 - **Check**: Test with bounded query
 - **Keep**: Record decision and lessons learned
-
-**How LOCK relates to PEAK:**
-
-PEAK's Prepare → Execute → Act maps naturally to LOCK. But LOCK adds the structure needed for AI integration:
-- Consistent markdown format AI can parse
-- Standardized sections AI can extract from
-- Memory architecture AI can query
-
-**Use PEAK for your hunting process. Use LOCK for your hunt documentation structure.**
-
-Together, they let you hunt systematically (PEAK) while building AI-readable knowledge (LOCK).
 
 ## The LOCK Pattern
 
@@ -273,8 +256,6 @@ PEAK's **Prepare → Execute → Act with Knowledge** maps naturally to LOCK:
 | **Prepare** | Learn + Observe | AI drafts hypotheses, recalls past hunts |
 | **Execute** | Check | AI generates queries, validates approach |
 | **Act with Knowledge** | Keep | AI documents lessons, surfaces patterns |
-
-**Use PEAK for your hunting process. Use LOCK for your documentation structure. Use ATHR to integrate AI at each phase.**
 
 ATHR templates structure your Prepare/Execute/Act phases in LOCK format so AI agents can parse them.
 
