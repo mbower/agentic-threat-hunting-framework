@@ -115,30 +115,31 @@ grep -i "privilege escalation" hunts/*.md  # Find by keyword
 
 This manual recall loop works at Level 1: Persistent. At Level 2: Augmented, AI tools do this automatically.
 
-## Using Environmental Context (environment.md, vulnerabilities.md)
+## Using Environmental Context (environment.md)
 
 At **Level 2: Augmented**, incorporate environmental context into your workflow:
 
 ### Before Planning a Hunt
 
 ```bash
-# CVE alert: "Critical vulnerability in Nginx 1.21.x"
+# Threat Intel: "Adversaries abusing LSASS process access for credential dumping"
 
-# 1. Check if we run affected tech
-grep -i "nginx" environment.md
-# Result: Found "Nginx 1.21.6 on web-proxy-01 through web-proxy-05"
+# 1. Check if we have visibility into this behavior
+grep -i "lsass\|credential" environment.md
+# Result: Found "Sysmon Event ID 10 (ProcessAccess) enabled on Windows endpoints"
 
-# 2. Check if we've already hunted this
-grep -i "CVE-2024-1234" vulnerabilities.md
-# Result: Not found - this is new
+# 2. Check for similar past hunts
+grep -i "lsass" hunts/*.md
+grep -i "T1003" hunts/*.md
+grep -i "credential" hunts/*.md
+# Result: H-0022 hunted LSASS access 6 months ago
 
-# 3. Check for similar past hunts
-grep -i "nginx" hunts/*.md
-grep -i "http smuggling" hunts/*.md
-# Result: H-0034 hunted similar web exploit patterns
+# 3. Review past lessons
+cat hunts/H-0022*.md | grep -A5 "Lessons Learned"
+# Result: Found false positives from AV scanners and monitoring tools
 
 # 4. Use prompt with enriched context
-# Copy to AI: "We run Nginx 1.21.6. Past hunt H-0034 found X. Generate hypothesis for CVE-2024-1234..."
+# Copy to AI: "We have Sysmon Event ID 10. Past hunt H-0022 found FPs from AV tools. Generate hypothesis for LSASS credential dumping..."
 ```
 
 ### Environment-Aware Hypothesis Generation
@@ -146,55 +147,58 @@ grep -i "http smuggling" hunts/*.md
 When using **hypothesis-generator.md**, include environmental context:
 
 ```
-Context: CVE-2024-1234 affects Nginx versions 1.20.0-1.22.1
+Context: Threat intel reports adversaries using living-off-the-land binaries (LOLBins) for lateral movement, specifically abusing certutil.exe to download malicious payloads
 
 Our environment (from environment.md):
-- Nginx 1.21.6 on web-proxy-01 through web-proxy-05
-- Logs: web access logs in Splunk (index=web_proxy)
-- Network: Public-facing load balancers
-- WAF: Cloudflare in front of Nginx
+- Windows endpoints with Sysmon Event ID 1 (Process Creation)
+- Command line logging enabled
+- Logs: Windows logs in Splunk (index=winlogs)
+- Network: Egress proxy logs capture external connections
 
 Past similar hunts:
-- H-0034: HTTP request smuggling hunt (found 2 attempts)
+- H-0041: PowerShell download cradles (found 3 legitimate admin scripts, 0 malicious)
+- H-0028: BITSAdmin abuse (found 1 suspicious transfer from contractor)
 
-Generate LOCK hypothesis for hunting CVE-2024-1234 exploitation attempts.
+Generate LOCK hypothesis for hunting certutil.exe abuse for payload downloads.
 ```
 
 This provides AI with:
-- **Tech context** (what we run)
+- **Tech context** (what visibility we have)
 - **Data context** (where to look)
-- **Historical context** (past lessons)
+- **Historical context** (past lessons and FPs)
 
 ### Level 3+ Automation Example
 
 At Level 3, this becomes automated:
 
 ```python
-# CVE monitoring agent (runs daily)
-def check_new_cves():
-    new_cves = fetch_nvd_feed()
+# Threat intel monitoring agent (runs daily)
+def check_new_threat_intel():
+    new_intel = fetch_threat_feeds()  # CTI feeds, MITRE updates, etc.
 
-    # Read tech stack
+    # Read tech stack and data sources
     tech_stack = parse_environment_md()
+    past_hunts = load_hunt_history()
 
-    for cve in new_cves:
-        # Check if CVE affects our environment
-        if cve.product in tech_stack:
-            # Check if we've hunted this
-            if not exists_in_vulnerabilities_md(cve.id):
-                # Check exploit availability
-                exploit = check_exploit_db(cve.id)
+    for intel in new_intel:
+        # Check if we have visibility for this TTP
+        if has_data_sources_for_ttp(intel.ttp, tech_stack):
+            # Check if we've hunted this recently
+            if not hunted_in_last_90_days(intel.ttp, past_hunts):
+                # Check threat relevance
+                if intel.threat_score >= 7.0:
+                    # Search for similar past hunts
+                    similar_hunts = grep_similar_hunts(intel.ttp)
 
-                if exploit.public and cve.cvss >= 7.0:
-                    # Auto-add to vulnerabilities.md
-                    add_cve_entry(cve, tech_stack[cve.product])
+                    # Generate hypothesis using AI
+                    hypothesis = generate_hypothesis(
+                        ttp=intel.ttp,
+                        environment=tech_stack,
+                        past_lessons=similar_hunts
+                    )
 
-                    # Generate hunt suggestion
-                    past_hunts = grep_similar_hunts(cve.product)
-                    hypothesis = generate_hypothesis(cve, tech_stack, past_hunts)
-
-                    # Alert human
-                    notify_slack(f"New hunt opportunity: {cve.id}")
+                    # Alert human for review
+                    notify_slack(f"New hunt opportunity: {intel.ttp} - {intel.description}")
 ```
 
-**Key insight:** environment.md + vulnerabilities.md enable vulnerability-driven hunting at scale.
+**Key insight:** environment.md + past hunt memory enable behavior-driven hunting at scale.

@@ -52,9 +52,9 @@ If AI can't read files, check:
 
 ## Core Workflows
 
-### Workflow 1: CVE-Driven Hunt (Most Common)
+### Workflow 1: Threat Intel-Driven Hunt (Most Common)
 
-**Scenario:** You receive a CVE alert or security advisory
+**Scenario:** You receive threat intelligence about adversary TTPs or emerging attack patterns
 
 **Total Time:** 5-10 minutes
 
@@ -62,32 +62,32 @@ If AI can't read files, check:
 
 **What to ask:**
 ```
-Check if we've hunted CVE-2024-XXXXX before. Search:
-1. hunts/ folder for this CVE
-2. vulnerabilities.md for tracking status
-3. Any related past hunts for similar vulnerabilities
+Check if we've hunted T1003.001 (LSASS credential dumping) before. Search:
+1. hunts/ folder for this TTP
+2. Any related past hunts for credential dumping behaviors
+3. Lessons learned from similar hunts
 ```
 
 **Expected Response:**
-- "No past hunts found for this CVE" → Proceed to Step 2
-- "Found H-0015 which hunted similar issue" → Review that hunt first, then proceed
+- "No past hunts found for this TTP" → Proceed to Step 2
+- "Found H-0022 which hunted this 6 months ago" → Review that hunt first, then proceed
 
-**Why this matters:** Avoids duplicate work, applies lessons learned
+**Why this matters:** Avoids duplicate work, applies lessons learned, reuses false positive filters
 
 #### Step 2: Validate Environment (1 min)
 
 **What to ask:**
 ```
 Read environment.md and tell me:
-1. Do we have the affected technology?
-2. What data sources can we use to hunt this?
+1. Do we have visibility into this behavior?
+2. What data sources can we use to hunt this TTP?
 3. Any telemetry gaps that would limit this hunt?
 ```
 
 **Expected Response:**
-- Lists affected tech if present (e.g., "Yes, you have Nginx 1.21 in production")
-- Identifies data sources (e.g., "You can use index=web_logs and index=edr")
-- Flags gaps (e.g., "Note: No network packet capture available")
+- Lists relevant data sources (e.g., "Yes, you have Sysmon Event ID 10 for process access")
+- Identifies specific indexes/tables (e.g., "You can use index=winlogs and index=edr")
+- Flags gaps (e.g., "Note: No command-line logging on legacy servers")
 
 **Decision point:** If critical telemetry is missing, document gap and reconsider hunt feasibility
 
@@ -95,21 +95,21 @@ Read environment.md and tell me:
 
 **What to ask:**
 ```
-Generate a LOCK-structured hypothesis for CVE-2024-XXXXX.
+Generate a LOCK-structured hypothesis for T1003.001 (LSASS credential dumping).
 Use the system prompt from prompts/hypothesis-generator-v2.md.
 This is a proactive hunt (not incident response).
 ```
 
 **Expected Response:**
 - Complete hypothesis in LOCK format
-- References YOUR data sources
-- Includes past hunt lessons if applicable
+- References YOUR data sources from environment.md
+- Includes past hunt lessons if applicable (especially FP filters)
 - Suggests time range and query approach
 
 **Review checklist:**
-- [ ] Hypothesis is testable
+- [ ] Hypothesis is testable and specific
 - [ ] Data sources match environment.md
-- [ ] Time range is reasonable
+- [ ] Time range is reasonable and bounded
 - [ ] ATT&CK mapping is correct
 
 #### Step 4: Create Hunt File (1 min)
@@ -129,7 +129,7 @@ Create this hypothesis as H-XXXX.md in the hunts/ folder.
 **What to ask:**
 ```
 Based on this hypothesis, generate a Splunk query with:
-1. Time bounds (last 30 days as specified in hypothesis)
+1. Time bounds (last 14 days as specified in hypothesis)
 2. Result limits (head 1000)
 3. False positive filters from past similar hunts
 4. Save as queries/H-XXXX.spl
@@ -137,26 +137,14 @@ Based on this hypothesis, generate a Splunk query with:
 
 **Expected Response:**
 - Safe, bounded query
-- Includes FP filters if applicable
-- Comments explaining query logic
+- Includes FP filters if applicable (e.g., exclude monitoring tools)
+- Comments explaining query logic and thresholds
 
 **Review checklist:**
-- [ ] Has time bounds (`earliest=-30d`)
+- [ ] Has time bounds (`earliest=-14d`)
 - [ ] Has result limit (`| head 1000`)
 - [ ] No expensive operations without justification
 - [ ] Test query is syntactically valid
-
-#### Step 6: Update Tracking (1 min)
-
-**What to ask:**
-```
-Add this CVE to vulnerabilities.md with:
-- Hunt status: Planned
-- Hunt ID: H-XXXX
-- Priority: [based on severity]
-```
-
-**AI will:** Update vulnerabilities.md with tracking entry
 
 **Total time: 5-10 minutes (vs. 20-30 minutes manual)**
 
@@ -330,7 +318,7 @@ Based on these results, should we update H-XXXX.md status?
 ```
 Generate 5 hypothesis candidates for next month based on:
 1. TTPs we haven't covered recently (check past 90 days in hunts/)
-2. Open CVEs in vulnerabilities.md (status: Monitoring)
+2. Recent threat intelligence and security advisories
 3. Our threat model (focus on [specify: ransomware, insider threat, etc.])
 
 For each, provide:
@@ -490,7 +478,6 @@ Before finalizing any AI-generated content:
 - [ ] Hypothesis file (H-XXXX.md) created
 - [ ] Query file (queries/H-XXXX.spl) created
 - [ ] Execution report (H-XXXX_DATE.md) after hunt
-- [ ] Vulnerabilities.md updated (if CVE-driven)
 - [ ] Lessons learned captured
 
 ---
@@ -519,7 +506,7 @@ Track these metrics to assess AI tool effectiveness:
 ## Next Steps
 
 ### Just Starting (Week 1-2)
-1. Use Workflow 1 (CVE-Driven) for your next CVE alert
+1. Use Workflow 1 (Threat Intel-Driven) for your next threat intelligence report
 2. Compare time vs. manual process
 3. Refine your environment.md based on what AI asks for
 

@@ -52,14 +52,8 @@ Edit `templates/` to match your:
 - List real technology stack (languages, frameworks, databases, cloud platforms)
 - Add links to internal documentation (wikis, architecture diagrams, CMDB)
 - Document known gaps and blind spots in your security coverage
+- Optionally include patch status and CVE context for awareness
 - Update quarterly or when major infrastructure changes occur
-
-**vulnerabilities.md** - Track CVEs relevant to your environment:
-- Add CVEs as they're published and affect your tech stack (cross-reference with environment.md)
-- Update exploit availability as public PoCs emerge
-- Track remediation status (patching timeline, workarounds deployed)
-- Record hunt status for vulnerability-driven hunts
-- Review weekly or when critical CVEs are announced
 
 **AGENTS.md** - Configure AI assistant context:
 - Update "Data Sources" section with your actual SIEM/EDR/network tools
@@ -85,7 +79,7 @@ Edit `templates/` to match your:
 **Level 2+: Augmented → Autonomous/Coordinated (Month 3-6+)**
 - Build scripts for repetitive tasks (if needed)
 - When grep is too slow (50+ hunts), add structured memory (JSON, SQLite)
-- See `metrics/README.md` for memory scaling options
+- See `memory/README.md` for memory scaling options
 
 ### 5. Build Your Hunt Library
 
@@ -103,17 +97,16 @@ ATHR is designed to work with your existing stack. See the README sections for d
 
 ## Maintaining Environmental Context
 
-Environmental context files ([environment.md](environment.md), [vulnerabilities.md](vulnerabilities.md)) are living documents that inform hunt planning and enable automation at higher maturity levels.
+The [environment.md](environment.md) file is a living document that informs hunt planning and enables AI-assisted hypothesis generation at all maturity levels.
 
-### Who Maintains These Files?
+### Who Maintains This File?
 
 **Shared responsibility model:**
-- **Security team:** Maintains vulnerabilities.md (CVE tracking, hunt opportunities)
 - **Infrastructure/DevOps:** Contributes to environment.md (tech stack changes, new services)
 - **Security architects:** Updates environment.md (network architecture, security tools)
-- **Threat hunters:** Updates both based on hunt findings (discovered services, exploited vulnerabilities)
+- **Threat hunters:** Updates based on hunt findings (discovered services, blind spots)
 
-**For small teams:** One person maintains both, updates as needed.
+**For small teams:** One person maintains environment.md, updates as needed.
 
 ### Maintenance Cadence
 
@@ -124,14 +117,6 @@ Environmental context files ([environment.md](environment.md), [vulnerabilities.
   - Infrastructure migrations (cloud migration, datacenter moves)
   - Major application launches
   - Security architecture changes
-
-**vulnerabilities.md:**
-- **Ongoing/Weekly** - Active vulnerability tracking:
-  - New CVEs affecting your tech stack (monitor feeds)
-  - Exploit availability updates (PoC published, active exploitation reported)
-  - Remediation status changes (patches deployed, workarounds implemented)
-  - Hunt completion (update status when vulnerability-driven hunts finish)
-- **Quarterly cleanup** - Move resolved CVEs >1 year old to archive
 
 **AGENTS.md:**
 - **As needed** - When data sources change, AI tools change, or team practices evolve
@@ -144,8 +129,8 @@ As your hunt repository grows, your memory needs evolve:
 **10-50 hunts (Level 1-2):**
 - Grep across markdown files works fine
 - No additional structure needed
-- Search `hunts/`, `environment.md`, `vulnerabilities.md` with grep
-- Example: `grep -i "nginx" environment.md hunts/*.md vulnerabilities.md`
+- Search `hunts/` and `environment.md` with grep
+- Example: `grep -i "nginx" environment.md hunts/*.md`
 
 **50-200 hunts (Level 2-3):**
 - Grep still works but starts to slow down
@@ -153,7 +138,7 @@ As your hunt repository grows, your memory needs evolve:
   - Tag system in markdown (e.g., `#ransomware`, `#credential-access`)
   - Hunt index file (manually maintained list of hunts by TTP)
   - Simple scripts to search across files
-- environment.md + vulnerabilities.md become increasingly valuable for filtering
+- environment.md becomes increasingly valuable for validating hunt feasibility
 
 **200+ hunts (Level 3-4):**
 - Structured memory becomes valuable:
@@ -161,7 +146,7 @@ As your hunt repository grows, your memory needs evolve:
   - SQLite database for faster queries
   - Full-text search (Elasticsearch, local search tools)
 - Agents can query structured memory efficiently
-- See [metrics/README.md](metrics/README.md) for implementation details
+- See [memory/README.md](memory/README.md) for implementation details
 
 **Key principle:** Don't build structure until grep becomes painful. Most teams operate at 10-50 hunts where grep is sufficient.
 
@@ -177,7 +162,7 @@ As your hunt repository grows, your memory needs evolve:
 **Integrated approach (Level 3+):**
 - Script to pull tech stack from CMDB API
 - Auto-update environment.md sections from authoritative sources
-- Cross-reference vulnerabilities.md against asset inventory
+- Keep tech inventory synchronized with actual infrastructure
 
 **Example automation:**
 ```python
@@ -200,7 +185,7 @@ def update_tech_stack():
 # Run weekly via cron
 ```
 
-**Benefit:** Ensures environment.md stays accurate as infrastructure changes, enabling reliable CVE-to-tech matching.
+**Benefit:** Ensures environment.md stays accurate as infrastructure changes, enabling AI to suggest feasible hunts based on actual data sources.
 
 ## Scaling ATHR in Your Organization
 
@@ -208,14 +193,14 @@ def update_tech_stack():
 - **Level 1-2: Persistent → Augmented**: Repo + AI tool (GitHub Copilot, Claude Code)
 - Keep hunts in personal repo or folder
 - Build memory with 10-20 reports before considering automation
-- Maintain environment.md + vulnerabilities.md yourself (15-30 min/week)
+- Maintain environment.md yourself (15-30 min/quarter, event-driven updates)
 
 ### Small Team (2-5 people)
 - **Level 1-2: Persistent → Augmented**: Shared repo + AI tools
 - Git, SharePoint, Confluence, Jira, or Notion
 - Collaborative memory via shared hunt notes
 - Optional: One person builds simple scripts for repetitive tasks
-- Divide maintenance: 1 person owns vulnerabilities.md, all update environment.md
+- Shared responsibility: All team members update environment.md as they discover changes
 
 ### Security Team (5-20 people)
 - **Level 2-3: Augmented → Autonomous**: AI tools + optional automation
@@ -223,7 +208,6 @@ def update_tech_stack():
 - Metrics dashboards
 - Structured memory when grep becomes slow
 - Formalize environment.md updates (DevOps contributes, hunters consume)
-- CVE monitoring becomes team ritual (weekly review of vulnerabilities.md)
 
 ### Enterprise SOC (20+ people)
 - **Level 3-4: Autonomous → Coordinated**: Automation + multi-agent systems
@@ -231,7 +215,6 @@ def update_tech_stack():
 - Detection engineering pipeline integration
 - Learning systems (rare)
 - Automated environment.md updates from CMDB/asset management
-- Agents monitor CVE feeds and auto-populate vulnerabilities.md
 
 ## Mapping ATHR to Your Existing Framework
 

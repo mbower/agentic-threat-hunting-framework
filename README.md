@@ -212,52 +212,35 @@ Real-world example showing:
 - How to build memory through dated executions
 - How lessons learned improve future hunts
 
-### Memory System Guide (`metrics/`)
+### Memory System Guide (`memory/`)
 - Level 1-2: Persistent/Augmented - Grep-based memory (no additional tools)
 - Level 3+: Autonomous/Coordinated - When to add structured memory (JSON, SQLite)
 - Scaling guidance for 10, 50, 500+ hunts
 
-### Environmental Context (`environment.md`, `vulnerabilities.md`)
-Context files that inform hunt planning and enable automated vulnerability-driven hunting:
+### Environmental Context (`environment.md`)
+Context file that informs hunt planning and AI-assisted hypothesis generation:
 
 **environment.md** - Tech stack inventory:
 - Security tools (SIEM, EDR, network monitoring)
 - Technology stack (languages, frameworks, databases, cloud platforms)
 - Internal documentation links (wikis, architecture diagrams, asset inventory)
 - Network architecture and infrastructure
+- Patch status and CVE context (for awareness, not hunting driver)
 
-**vulnerabilities.md** - CVE tracking:
-- Known vulnerabilities affecting your environment
-- Exploit availability and active exploitation status
-- Hunt opportunities (CVEs that warrant proactive hunting)
-- Remediation tracking and status updates
-
-**How these support hunting:**
+**How this supports hunting:**
 - **Level 0-1**: Manual reference when planning hunts
-- **Level 2**: Grep across environment + past hunts to avoid duplicates and match CVEs to tech
-- **Level 3+**: Agents auto-match CVEs to tech stack, generate hunt suggestions when exploits emerge
+- **Level 2**: AI reads environment.md to suggest relevant data sources and validate hypothesis feasibility
+- **Level 3+**: Agents auto-validate hunts against tech stack, identify telemetry gaps
 
-**Example Level 3 automation:**
+**Example Level 2 workflow:**
 ```
-CVE agent monitors feeds → Cross-references environment.md →
-Finds: CVE-2024-1234 affects Nginx 1.21.6 → Exploit published →
-Auto-generates hunt hypothesis in vulnerabilities.md →
-Human reviews and executes hunt
+You: "Generate hypothesis for credential dumping via LSASS"
+AI: *reads environment.md*
+    "I see you have Windows systems with Sysmon Event ID 10 (process access).
+    I'll focus the hypothesis on detecting MiniDump API calls to lsass.exe..."
 ```
 
-See files for detailed templates and integration examples.
-
-## How ATHR Works With PEAK
-
-PEAK's **Prepare → Execute → Act with Knowledge** maps naturally to LOCK:
-
-| PEAK Phase | LOCK Step | AI Integration |
-|------------|-----------|----------------|
-| **Prepare** | Learn + Observe | AI drafts hypotheses, recalls past hunts |
-| **Execute** | Check | AI generates queries, validates approach |
-| **Act with Knowledge** | Keep | AI documents lessons, surfaces patterns |
-
-ATHR templates structure your Prepare/Execute/Act phases in LOCK format so AI agents can parse them.
+See environment.md template for detailed inventory structure.
 
 ## Progression Guide
 
@@ -362,7 +345,7 @@ Once you have AGENTS.md configured and an AI tool installed, here's your typical
 
 #### Generating Hypotheses from Threat Intel
 
-**Scenario:** You receive a CVE alert or read threat intelligence
+**Scenario:** You receive threat intelligence about adversary TTPs or emerging attack patterns
 
 **Workflow:**
 
@@ -370,24 +353,25 @@ Once you have AGENTS.md configured and an AI tool installed, here's your typical
 
 2. **Ask the AI to check memory first:**
    ```
-   You: "Check if we've hunted CVE-2024-21412 (Windows SmartScreen bypass) before"
+   You: "Check if we've hunted for T1218.011 (Rundll32 execution) before"
 
-   AI: *searches hunts/ and vulnerabilities.md*
-        "No past hunts found for this CVE. I see you have Windows systems with
-        Sysmon logging (from environment.md). Should I generate a hypothesis?"
+   AI: *searches hunts/ folder*
+        "Found H-0018 from 3 months ago targeting Rundll32 DLL execution.
+        That hunt focused on unsigned DLLs. Should I generate a new hypothesis
+        for a different angle, like suspicious command-line patterns?"
    ```
 
 3. **Request hypothesis generation:**
    ```
-   You: "Yes, generate a LOCK-structured hypothesis"
+   You: "Yes, generate a LOCK-structured hypothesis for Rundll32 abuse"
 
-   AI: *reads AGENTS.md, environment.md, past SmartScreen hunts*
+   AI: *reads AGENTS.md, environment.md, past Rundll32 hunts*
         *generates complete hypothesis with:*
         - Testable hypothesis statement
-        - Context (why now, ATT&CK mapping)
+        - Context (why now, ATT&CK mapping T1218.011)
         - Data sources from YOUR environment
         - Time range recommendations
-        - Query approach
+        - Query approach with lessons from H-0018
    ```
 
 4. **Review and create hunt file:**
@@ -410,14 +394,13 @@ Once you have AGENTS.md configured and an AI tool installed, here's your typical
 #### Key AI Commands to Use
 
 **Memory Recall:**
-- "What have we learned about [TTP/CVE/behavior]?"
+- "What have we learned about [TTP/behavior]?"
 - "Find past hunts for T1110 brute force"
 - "Have we hunted this before?"
 
 **Hypothesis Generation:**
-- "Generate hypothesis for [CVE/TTP/anomaly]"
+- "Generate hypothesis for [TTP/threat intel]"
 - "Based on past [similar hunt], create a new hypothesis for [new context]"
-- "We're seeing [anomaly]. Create an incident-driven hunt hypothesis"
 
 **Query Building:**
 - "Draft a query for this hypothesis with safety bounds"
@@ -427,7 +410,7 @@ Once you have AGENTS.md configured and an AI tool installed, here's your typical
 **Documentation:**
 - "Summarize these hunt results in LOCK format"
 - "Document lessons learned from this hunt"
-- "Update vulnerabilities.md with this CVE and hunt status"
+- "Create execution report with findings and next actions"
 
 #### What Makes This Work
 
@@ -436,8 +419,7 @@ The AI can assist effectively because:
 1. **AGENTS.md** tells it how to use your repository
 2. **LOCK structure** provides consistent format for parsing
 3. **Past hunts** serve as memory for lessons learned
-4. **environment.md** ensures suggestions match your tech stack
-5. **vulnerabilities.md** tracks CVE hunt status
+4. **environment.md** ensures suggestions match your tech stack and data sources
 
 #### Common Pitfalls to Avoid
 

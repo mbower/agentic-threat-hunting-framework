@@ -16,7 +16,7 @@ This repository contains threat hunting hypotheses, execution notes, and lessons
 - Read past hunt notes before suggesting new hypotheses
 - Reference lessons learned when generating queries
 - Avoid suggesting hunts we've already completed
-- Use environment.md and vulnerabilities.md to inform hunt planning
+- Use environment.md to inform hunt planning
 
 ---
 
@@ -30,9 +30,8 @@ This repository contains threat hunting hypotheses, execution notes, and lessons
 ├── templates/          # LOCK-structured templates for new hunts
 ├── prompts/            # AI prompt templates for manual workflows
 ├── queries/            # Reusable query patterns
-├── metrics/            # Performance tracking and memory guidance
-├── environment.md      # Tech stack, tools, infrastructure inventory
-└── vulnerabilities.md  # CVE tracking and hunt opportunities
+├── memory/             # Hunt memory and recall system
+└── environment.md      # Tech stack, tools, infrastructure inventory
 ```
 
 ---
@@ -49,7 +48,7 @@ This repository contains threat hunting hypotheses, execution notes, and lessons
 **How AI should use this:**
 - Reference when generating hypotheses to ensure hunt is relevant to our tech stack
 - Check data sources available before suggesting queries
-- Cross-reference CVEs against our actual deployed technologies
+- Understand what technologies are deployed (including patch levels/CVE context)
 - Understand what visibility/telemetry we have for proposed hunts
 
 **Example:**
@@ -59,27 +58,7 @@ AI: *checks environment.md* "I see you run Java applications with log aggregatio
      in Splunk. Here's a hypothesis targeting your environment..."
 ```
 
-### vulnerabilities.md
-**Contains:**
-- Known CVEs affecting our environment (cross-referenced with environment.md)
-- Exploit availability and active exploitation status
-- Hunt opportunities prioritized by severity + exploit maturity
-- Remediation tracking and hunt status
-
-**How AI should use this:**
-- Check before suggesting CVE-driven hunts (avoid duplicates)
-- Reference past vulnerability hunts when generating new hypotheses
-- Suggest updating this file when new CVEs are published for our tech stack
-- Use exploit availability data to prioritize hunt suggestions
-
-**Example:**
-```
-User: "What should we hunt for this week?"
-AI: *reads vulnerabilities.md* "Based on open vulnerabilities:
-     - CVE-2024-1234 affects your Nginx deployment (exploit published yesterday)
-     - CVE-2024-5678 is being actively exploited (CISA KEV listed)
-     I recommend prioritizing these two..."
-```
+**Note:** environment.md may include CVE/patch status for context, but this framework focuses on **behavior-based hunting**, not vulnerability scanning.
 
 ---
 
@@ -124,7 +103,7 @@ AI: *reads vulnerabilities.md* "Based on open vulnerabilities:
 
 This repository follows the **LOCK pattern**:
 
-1. **Learn** - Gather context (CTI, alert, anomaly, vulnerability)
+1. **Learn** - Gather context (CTI, alert, anomaly, threat intel)
 2. **Observe** - Form hypothesis about adversary behavior
 3. **Check** - Test with bounded, safe query
 4. **Keep** - Record decision and lessons learned
@@ -158,9 +137,8 @@ This repository follows the **LOCK pattern**:
 - **Link related hunts** (if this builds on past work, reference it)
 
 ### Memory and Context
-- **Search before suggesting** - Check if we've hunted this TTP/CVE/behavior before
+- **Search before suggesting** - Check if we've hunted this TTP/behavior before
 - **Reference environment.md** - Ensure suggestions match our actual tech stack
-- **Check vulnerabilities.md** - Don't suggest hunts we've already completed
 - **Apply past lessons** - Use outcomes from similar hunts to improve new hypotheses
 
 ---
@@ -178,21 +156,11 @@ This repository follows the **LOCK pattern**:
 4. Generate LOCK-formatted hypothesis referencing available data sources
 5. Suggest query targeting confirmed data sources (e.g., Windows Security Event Logs in Splunk)
 
-**User asks:** "What should we hunt based on recent CVEs?"
-
-**AI should:**
-1. Read `vulnerabilities.md` to see open/monitoring CVEs
-2. Cross-reference against `environment.md` to confirm affected tech
-3. Check `hunts/` to see if we've already hunted these CVEs
-4. Prioritize by: Severity + Exploit availability + Not yet hunted
-5. Generate hunt suggestions with hypotheses
-
 ### Level 3+ (Autonomous) - Scripted Workflows
 
 When building automation scripts, AI should:
 - Reference this AGENTS.md file to understand repo structure
 - Use environment.md as the tech stack source of truth
-- Update vulnerabilities.md when discovering new relevant CVEs
 - Follow LOCK structure when auto-generating hunt files
 - Include human-in-the-loop validation for high-risk operations
 
@@ -205,11 +173,10 @@ This section provides detailed guidance for AI assistants on generating threat h
 ### When to Generate Hypotheses
 
 AI should offer to generate hypotheses when users provide:
-- CVE identifiers (e.g., "CVE-2024-1234")
 - Threat intelligence reports (APT activity, campaign analysis)
-- Detection anomalies ("seeing spike in failed logins")
 - TTP references (e.g., "T1003 credential dumping")
 - Security news/advisories (CISA alerts, vendor bulletins)
+- Observed anomalies or suspicious behaviors
 
 ### Step-by-Step Workflow
 
@@ -217,9 +184,9 @@ AI should offer to generate hypotheses when users provide:
 ```
 AI Action: Search past hunts before generating anything new
 Commands:
-- Search hunts/ for similar TTPs, CVEs, or behaviors
-- Check vulnerabilities.md for CVE status
+- Search hunts/ for similar TTPs or behaviors
 - Look for related hypotheses that might be adapted
+- Check for lessons learned from past similar hunts
 
 AI Response: "I found 2 past hunts related to this:
 - H-0015 (2024-09-12): Similar TTP, found X
@@ -267,63 +234,7 @@ AI Response: Be proactive but wait for confirmation before creating files
 
 ### Example Conversations
 
-#### Example 1: CVE-Driven Hypothesis
-
-**User:** "Generate hypothesis for CVE-2024-21412 (Windows SmartScreen bypass)"
-
-**AI Should:**
-1. Check vulnerabilities.md for existing entry
-2. Read environment.md for Windows deployment details
-3. Search hunts/ for past SmartScreen or bypass hunts
-4. Generate hypothesis:
-
-```markdown
-# H-XXXX | CVE-2024-21412 SmartScreen Bypass Hunt
-
-**Status:** Candidate
-
-## Hypothesis
-Adversaries exploit CVE-2024-21412 to bypass Windows SmartScreen by crafting
-internet shortcut files that execute malicious payloads without security warnings.
-
-## Context
-
-**Why Now:**
-- CVE published 2024-02-13, exploited in-the-wild (CISA KEV)
-- PoC available on GitHub
-- Affects all Windows systems [check environment.md for versions]
-
-**ATT&CK:** T1204.001 (User Execution: Malicious Link)
-**Tactic:** Initial Access
-
-## Data Needed
-- **Windows Event Logs:** Sysmon Event ID 1 (Process Creation)
-- **EDR Telemetry:** File creation events (*.url, *.lnk files)
-- **Network Logs:** HTTP downloads preceding file execution
-
-[Reference environment.md for actual index names]
-
-## Time Range
-- Start: 2024-02-13 (CVE public disclosure)
-- Recommended: Last 30 days initially
-
-## Query Approach
-1. Find execution of processes from user temp directories
-2. Preceded by creation of .url or .lnk files
-3. Originating from browser downloads
-4. Without SmartScreen warnings (absence of expected events)
-
-## Next Steps
-- Create query in queries/H-XXXX.spl
-- Execute and document in H-XXXX_YYYY-MM-DD.md
-```
-
-**AI Should Then Ask:** "Would you like me to:
-1. Create this as H-XXXX.md in hunts/ folder?
-2. Draft the actual SIEM query?
-3. Update vulnerabilities.md with this hunt plan?"
-
-#### Example 2: TTP-Driven Hypothesis
+#### Example 1: TTP-Driven Hypothesis
 
 **User:** "We need to hunt for Living off the Land (LOLBins) abuse"
 
@@ -397,91 +308,24 @@ application control by using Windows built-in functionality for payload executio
 **AI Should Then:** "This hypothesis builds on lessons from H-0008 (past rundll32 hunt).
 Should I pull those specific false positive filters to include in the query?"
 
-#### Example 3: Anomaly-Driven Hypothesis
-
-**User:** "We're seeing a spike in failed VPN authentications from IP 203.0.113.45"
-
-**AI Should:**
-1. Recognize this as incident-driven, not proactive
-2. Search for past brute force hunts (T1110)
-3. Check environment.md for VPN platform and auth logs
-4. Generate time-sensitive hypothesis:
-
-```markdown
-# H-XXXX | VPN Brute Force from 203.0.113.45
-
-**Status:** Candidate
-**Priority:** HIGH (active incident)
-
-## Hypothesis
-Adversary is conducting brute force authentication attempts against VPN
-infrastructure from IP 203.0.113.45 to gain initial access.
-
-## Context
-
-**Why Now:**
-- Detected anomaly: Spike in failed VPN auth from single IP
-- Requires immediate investigation (potential active attack)
-
-**ATT&CK:** T1110.001 (Brute Force: Password Guessing)
-**Tactic:** Initial Access
-
-## Data Needed
-- **VPN Logs:** Authentication attempts (success/failure)
-- **Firewall:** Connection attempts to VPN gateway
-- **Identity Provider:** Account lockout events
-
-[Based on environment.md: VPN logs in SIEM, reference actual index]
-
-## Time Range
-- **Critical Window:** Last 24 hours (when spike detected)
-- **Historical Context:** Past 7 days (establish baseline)
-
-## Query Approach
-1. Failed VPN auth from 203.0.113.45
-2. Identify targeted usernames
-3. Check if any successful auths from same IP
-4. Cross-reference with threat intel (IP reputation)
-5. Look for distributed attempts (same usernames, different IPs)
-
-## Immediate Actions (before full hunt)
-- Block 203.0.113.45 at firewall (if not already done)
-- Check for any successful logins from this IP
-- Alert affected users if credentials may be compromised
-
-## Next Steps
-- Execute query immediately (incident response)
-- Document findings in H-XXXX_YYYY-MM-DD.md
-- Escalate any successful compromises to IR team
-```
-
-**AI Should Emphasize:** "This is incident response, not routine hunting.
-Execute query immediately and document as you go. Should I draft the query now?"
-
 ### Memory Search Patterns
 
 When users ask to generate hypotheses, AI should automatically search:
 
-**Pattern 1: CVE-Based**
-```
-Search: grep -l "CVE-YYYY-NNNNN" hunts/*.md vulnerabilities.md
-Purpose: Check if we've already hunted or tracked this CVE
-```
-
-**Pattern 2: TTP-Based**
+**Pattern 1: TTP-Based**
 ```
 Search: grep -l "T####" hunts/*.md
 Purpose: Find past hunts for same ATT&CK technique
 ```
 
-**Pattern 3: Behavior-Based**
+**Pattern 2: Behavior-Based**
 ```
 Search: grep -li "keyword" hunts/*.md
 Keywords: "brute force", "lateral movement", "credential dump", etc.
 Purpose: Find hunts with similar behaviors
 ```
 
-**Pattern 4: Technology-Based**
+**Pattern 3: Technology-Based**
 ```
 Search: grep -li "technology" hunts/*.md environment.md
 Examples: "VPN", "Active Directory", "AWS S3"
@@ -504,7 +348,7 @@ AI should validate before generating hypothesis:
 
 **Check 3: Duplication**
 - Question: "Have we hunted this before?"
-- Action: Search hunts/ and vulnerabilities.md
+- Action: Search hunts/ for similar TTPs and behaviors
 - Response: Reference past hunts, suggest building on lessons
 
 **Check 4: Testability**
@@ -554,7 +398,7 @@ All AI-generated hypotheses must follow:
 
 **Mistake 4: No Time Bounds**
 ❌ Bad: "Search all time for suspicious activity"
-✅ Good: "Search last 30 days (CVE published date) to present"
+✅ Good: "Search last 30 days (threat intel published date) to present"
 
 **Mistake 5: Forgetting Lessons Learned**
 ❌ Bad: Generate query that past hunts found generates noise
@@ -602,7 +446,7 @@ All AI-generated hypotheses must follow:
 
 ---
 
-## Memory Scaling (Reference: metrics/README.md)
+## Memory Scaling (Reference: memory/README.md)
 
 **Current maturity level:** [0: Ephemeral | 1: Persistent | 2: Augmented | 3: Autonomous | 4: Coordinated]
 
@@ -612,8 +456,7 @@ All AI-generated hypotheses must follow:
 
 **When AI needs to recall past hunts:**
 - Use grep/search across `hunts/` folder (hunt notes)
-- Use grep/search across `environment.md` (tech stack)
-- Use grep/search across `vulnerabilities.md` (CVE tracking)
+- Use grep/search across `environment.md` (tech stack and context)
 - At Level 3+: Query structured memory if available
 
 ---

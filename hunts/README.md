@@ -84,9 +84,28 @@ grep "Status.*Completed" hunts/H-*_*.md
 grep "Needs Changes" hunts/H-*_*.md
 ```
 
-## Memory Building (Level 1: Persistent)
+## Memory Building (Levels 1-3)
 
-Before starting a new hunt, search past executions to avoid duplicates and apply lessons:
+Before starting a new hunt, search past executions to avoid duplicates and apply lessons.
+
+### Using AI Assistants (Level 2: Augmented)
+
+If you're using Claude Code, GitHub Copilot, or similar AI tools:
+
+**Ask your AI assistant to search for you:**
+```
+"Search past hunts for T1110.001 credential access attempts"
+"Find hunts where we dealt with brute force attacks"
+"What lessons did we learn from past PowerShell hunts?"
+"Show me all hunts that found accepted findings"
+"Have we hunted Active Directory lateral movement before?"
+```
+
+The AI will grep the hunts/ folder and summarize findings for you.
+
+### Manual Grep (Levels 1-3)
+
+If you prefer command line:
 
 ```bash
 # Find past hunts for a TTP
@@ -111,7 +130,7 @@ grep "Decision.*Accept" hunts/H-*_*.md
 grep "Lessons Learned" -A 3 hunts/H-*_*.md
 ```
 
-This recall discipline is what makes hunting agentic.
+**Both approaches work through Level 3.** When you have 50+ hunts or need multi-agent coordination, see [memory/README.md](../memory/README.md) for structured memory options.
 
 ## Tips
 

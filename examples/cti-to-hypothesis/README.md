@@ -10,10 +10,12 @@ Each example demonstrates:
 - Complete conversation flow between human and AI
 - Memory searches (checking past hunts)
 - Environment validation (checking data sources)
-- Hypothesis generation following LOCK pattern
-- Query creation with safety bounds
+- AI-generated hypothesis summaries (not full artifacts)
 - Human validation and refinement
+- Decision-making and trade-offs
 - Time savings vs. manual process
+
+**Focus:** These examples show the **workflow and decisions**, not the full hypothesis artifacts. You'll see what the AI generates (summarized), but more importantly, how the human validates, challenges, and refines the output.
 
 **These are not toy examples** - they show realistic workflows with real decisions, trade-offs, and challenges.
 
@@ -21,27 +23,7 @@ Each example demonstrates:
 
 ## Examples
 
-### 1. [from-cve.md](from-cve.md) - CVE-Driven Hunt
-
-**Scenario:** CISA alert for CVE-2024-3094 (XZ Utils backdoor)
-
-**Hunt Type:** Proactive, intelligence-driven
-
-**Time:** 8 minutes (vs. 45+ minutes manual)
-
-**Key Lessons:**
-- How AI searches past hunts automatically
-- Environment validation catches missing telemetry
-- Human validation critical for query safety
-- Past hunt lessons (H-0008, H-0021) applied automatically
-
-**Best For:** Learning the standard CVE → hypothesis workflow
-
-**Complexity:** ⭐⭐⭐ Medium
-
----
-
-### 2. [from-apt-report.md](from-apt-report.md) - APT Campaign Hunt
+### 1. [from-intel.md](from-intel.md) - Threat Intel Hunt
 
 **Scenario:** Threat intel report about APT29 targeting cloud infrastructure
 
@@ -61,33 +43,14 @@ Each example demonstrates:
 
 ---
 
-### 3. [from-anomaly.md](from-anomaly.md) - Incident Response
-
-**Scenario:** SOC alert for VPN brute force (active attack)
-
-**Hunt Type:** Incident response, time-critical
-
-**Time:** 6 minutes (alert to containment)
-
-**Key Lessons:**
-- Speed over perfection in incident response
-- AI provides instant baseline comparison
-- Decision trees (IF compromise THEN escalate)
-- Documentation during incident (not after)
-
-**Best For:** Learning incident response workflows
-
-**Complexity:** ⭐⭐ Easy (but high pressure)
-
----
-
 ## How to Use These Examples
 
 ### For Learning
 
-1. **Read in order:** from-cve.md → from-apt-report.md → from-anomaly.md
-   - Builds from simple to complex
-   - Shows different hunt types
+1. **Study the example:**
+   - Shows realistic threat intel → hypothesis workflow
+   - Demonstrates proactive, intelligence-driven hunting
+   - Includes human validation and iterative refinement
 
 2. **Note the patterns:**
    - AI always searches past hunts first
@@ -97,43 +60,36 @@ Each example demonstrates:
 
 3. **Try it yourself:**
    - Open your AI tool in your hunt repository
-   - Find a recent CVE or alert
-   - Follow the workflow from the examples
+   - Find a recent threat intel report or security advisory
+   - Follow the workflow from the example
    - Compare your results
 
 ### For Reference
 
-**When you receive a CVE alert:**
-→ Use [from-cve.md](from-cve.md) as a template
-
-**When threat intel shares an APT report:**
-→ Use [from-apt-report.md](from-apt-report.md) for scoping guidance
-
-**When SOC pages you about an anomaly:**
-→ Use [from-anomaly.md](from-anomaly.md) for rapid response
+**When you receive threat intelligence:**
+→ Use [from-intel.md](from-intel.md) for scoping guidance and workflow
 
 ### For Training
 
 **Training new team members:**
-1. Have them read all three examples
-2. Practice with past CVEs (simulate the workflow)
-3. Pair with experienced hunter on first real incident
+1. Have them read the threat intel example
+2. Practice with past threat intel reports (simulate the workflow)
+3. Pair with experienced hunter on first real threat hunt
 4. Review their AI-generated hypotheses before execution
 
 **Training AI to work better:**
-- Show these examples to your AI tool
-- Reference them: "Generate hypothesis like the CVE example"
-- Use as templates for your organization's specific needs
+- Show this example to your AI tool
+- Reference it: "Generate hypothesis like the threat intel example"
+- Adapt the workflow for your organization's specific needs
 
 ---
 
-## Common Patterns Across All Examples
+## Common Patterns
 
 ### The AI Workflow (Consistent)
 
 **Step 1: Check Memory**
 - Search hunts/ for similar past work
-- Check vulnerabilities.md for CVE status
 - Reference lessons learned from past hunts
 
 **Step 2: Validate Environment**
@@ -185,11 +141,9 @@ Each example demonstrates:
 
 | Hunt Type | Manual Time | AI-Assisted Time | Savings |
 |-----------|-------------|------------------|---------|
-| **CVE Hunt** | 45 min | 8 min | 82% |
-| **APT Report** | 90 min | 12 min | 87% |
-| **Incident Response** | 20-30 min | 6 min | 70-80% |
+| **Threat Intel** | 90 min | 12 min | 87% |
 
-**Average time savings: 80%**
+**Time savings: ~85-90%** (varies by hunt complexity)
 
 **What you do with saved time:**
 - Execute more hunts (quantity)
@@ -201,7 +155,7 @@ Each example demonstrates:
 
 ## Key Success Factors
 
-All three examples succeeded because:
+The example succeeds because:
 
 1. **AGENTS.md exists** - Provides AI context about repo and environment
 2. **Past hunts documented** - AI references H-0015, H-0008, etc. automatically
@@ -238,8 +192,8 @@ These examples show generic environments. For your organization:
 - Include your naming conventions
 
 ### Train Your Team
-- Share these examples in team wiki
-- Practice on past CVEs (retroactive learning)
+- Share this example in team wiki
+- Practice on past threat intel (retroactive learning)
 - Build team-specific examples (your environment, your past hunts)
 
 ---
@@ -296,11 +250,11 @@ These examples show generic environments. For your organization:
 
 ## Next Steps
 
-**After reading these examples:**
+**After reading this example:**
 
 1. **Try the workflow:**
-   - Pick a recent CVE or security advisory
-   - Follow the from-cve.md workflow
+   - Pick a recent threat intel report or security advisory
+   - Follow the from-intel.md workflow
    - Generate your first AI-assisted hypothesis
 
 2. **Review your own workflow:**

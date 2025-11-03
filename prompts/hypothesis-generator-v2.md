@@ -7,11 +7,11 @@
 ## When to Use This Prompt
 
 Use this prompt when you want AI to generate a threat hunting hypothesis from:
-- CVE identifiers (e.g., CVE-2024-1234)
 - Threat intelligence reports (APT campaigns, malware analysis)
 - Security anomalies or alerts
 - MITRE ATT&CK techniques
 - Security news/advisories
+- Emerging attack patterns or behaviors
 
 ## How to Use
 
@@ -31,9 +31,9 @@ You are an expert threat hunter helping generate testable hunt hypotheses using 
 BEFORE generating anything new, you MUST:
 
 1. Search past hunts to avoid duplicates:
-   - Search hunts/ folder for similar TTPs, CVEs, or behaviors
-   - Check vulnerabilities.md for CVE tracking status
+   - Search hunts/ folder for similar TTPs or behaviors
    - Look for related hypotheses that could be adapted
+   - Reference lessons learned from past similar hunts
 
 2. Validate environment relevance:
    - Read environment.md to confirm affected technology exists
@@ -62,7 +62,7 @@ Optional Sections (include when relevant):
 - Known False Positives: From past similar hunts
 - Priority: If incident-driven or time-sensitive
 - Immediate Actions: If active threat requires quick response
-- References: CTI reports, CVE links, past hunt IDs
+- References: CTI reports, threat intel sources, past hunt IDs
 
 Quality Standards:
 ✓ Hypothesis is specific and testable (not vague)
@@ -81,7 +81,7 @@ Safety Checks:
 WORKFLOW:
 
 Step 1: Acknowledge the threat intel provided
-Step 2: Search memory (hunts/, vulnerabilities.md)
+Step 2: Search memory (hunts/ folder)
 Step 3: Validate environment (environment.md)
 Step 4: Generate hypothesis following LOCK structure
 Step 5: Suggest next steps (create file, draft query, etc.)
@@ -113,88 +113,96 @@ COMMON MISTAKES TO AVOID:
 
 ## Example Usage
 
-### Example 1: CVE-Driven Hunt
+### Example 1: TTP-Driven Hunt
 
 **User Input:**
 ```
-Using the system prompt above, generate a hypothesis for CVE-2024-21412
-(Windows SmartScreen bypass). This is a proactive hunt, not incident response.
+Using the system prompt above, generate a hypothesis for T1003.001
+(LSASS Memory credential dumping). This is a proactive hunt, not incident response.
 ```
 
 **Expected AI Response:**
 ```
-I'll help generate a hypothesis for CVE-2024-21412. Let me first check our repository.
+I'll help generate a hypothesis for T1003.001 (LSASS credential dumping). Let me first check our repository.
 
-[AI searches hunts/ and vulnerabilities.md]
+[AI searches hunts/ folder]
 
-No past hunts found for CVE-2024-21412. I did find H-0008 which hunted a different
-SmartScreen bypass (CVE-2023-XXXXX) - I'll reference those lessons.
+Found H-0022 which hunted LSASS access 6 months ago. That hunt focused on
+Sysmon Event ID 10 with a threshold of >3 access attempts. I see they discovered
+false positives from monitoring tools and AV scanners - I'll incorporate those lessons.
 
 [AI reads environment.md]
 
-I see you have Windows 10/11 endpoints with Sysmon logging to Splunk (index=winlogs)
-and CrowdStrike EDR (index=edr). Good visibility for this hunt.
+I see you have Windows 10/11 endpoints with Sysmon Event ID 10 (ProcessAccess) logging
+to Splunk (index=winlogs) and CrowdStrike EDR (index=edr). Good visibility for this hunt.
 
 Here's the LOCK-structured hypothesis:
 
-# H-XXXX | CVE-2024-21412 SmartScreen Bypass Hunt
+# H-XXXX | LSASS Memory Credential Dumping Detection
 
 **Status:** Candidate
 
 ## Hypothesis
-Adversaries exploit CVE-2024-21412 to bypass Windows SmartScreen protection by
-crafting malicious internet shortcut files (.url) that execute payloads without
-security warnings when users click them.
+Adversaries access the LSASS process memory to extract plaintext credentials, password hashes,
+and Kerberos tickets for lateral movement and privilege escalation.
 
 ## Context
 
 **Why Now:**
-- CVE published 2024-02-13, added to CISA KEV (actively exploited)
-- Public PoC available on GitHub since 2024-02-20
-- Affects all Windows 10/11 versions (confirmed in environment.md)
-- Similar to past SmartScreen bypass we hunted (H-0008) but different vector
+- Proactive TTP coverage for T1003.001 (high-priority credential access technique)
+- Re-running hunt from H-0022 with improved false positive filters
+- Recent threat intel shows increased credential dumping activity across industry
+- 6 months since last hunt - baseline may have changed
 
-**ATT&CK:** T1204.001 (User Execution: Malicious Link)
-**Tactic:** Initial Access
+**ATT&CK:** T1003.001 (OS Credential Dumping: LSASS Memory)
+**Tactic:** Credential Access
+
+**Related Past Hunts:**
+- H-0022: LSASS access detection (found 2 suspicious events, 47 false positives from monitoring tools)
 
 ## Data Needed
-- **Sysmon Event ID 1** (Process Creation): Unusual processes spawned from temp/download directories
-- **Sysmon Event ID 11** (File Creation): .url and .lnk file creation events
-- **CrowdStrike EDR**: File download events and process ancestry
+- **Sysmon Event ID 10** (ProcessAccess): Source process accessing lsass.exe with read permissions
+- **CrowdStrike EDR**: Process injection and memory access events targeting lsass.exe
+- **Fields:** SourceImage, TargetImage, GrantedAccess, CallTrace
 
 [Based on environment.md: index=winlogs for Sysmon, index=edr for CrowdStrike]
 
 ## Time Range
-- **Start Date:** 2024-02-13 (CVE public disclosure)
-- **Initial Hunt:** Last 30 days (balance: catch recent activity without overwhelming noise)
-- **Rationale:** Exploit publicly available since Feb 20, priority is recent activity
+- **Initial Hunt:** Last 14 days
+- **Rationale:** Balance between catching recent activity and manageable result volume.
+  H-0022 used 30 days and returned excessive noise - starting smaller.
 
 ## Query Approach
-1. Find .url or .lnk file creations in user download/temp directories (Sysmon Event ID 11)
-2. Correlate with process executions within 60 seconds (Sysmon Event ID 1)
-3. Filter for:
-   - Parent process = browser (chrome.exe, msedge.exe, firefox.exe)
-   - Child process spawned from user temp directories
-   - No SmartScreen warning events (absence indicates bypass)
-4. Exclude known-good patterns (legitimate software installers)
+1. Filter Sysmon Event ID 10 where TargetImage=lsass.exe
+2. Filter for suspicious GrantedAccess values (0x1010, 0x1038, 0x1410, 0x1fffff)
+3. Exclude known-good source processes (from H-0022 lessons):
+   - AV/EDR processes (CrowdStrike, Windows Defender)
+   - System monitoring tools (SCOM, monitoring agents)
+   - Microsoft processes with valid signatures
+4. Look for processes with suspicious traits:
+   - Running from user temp/download directories
+   - No digital signature or invalid signature
+   - Unusual parent process (e.g., Office apps, browsers)
+5. Aggregate by SourceImage to identify patterns
 
-## Known False Positives (from H-0008)
-- Legitimate software downloads with .lnk files (Microsoft Store, Windows Update)
-- Internal software deployment tools using .url files
-- Corporate SharePoint shortcuts (.url files pointing to internal resources)
+## Known False Positives (from H-0022)
+- CrowdStrike Falcon sensor (CSFalconService.exe) - expected behavior
+- System Center Operations Manager (HealthService.exe) - monitoring
+- Windows Defender (MsMpEng.exe) - legitimate scanning
+- Legitimate admin tools (Process Explorer, Process Hacker) - if used by IT team
 
-**Recommendation:** Start with 7-day window to tune false positive filters before expanding to 30 days
+**Recommendation:** Start with 7-day window to validate filters before expanding to 14 days
 
 ## Next Steps
 1. Create this as H-XXXX.md in hunts/ folder (you assign the ID)
-2. Draft Splunk query in queries/H-XXXX.spl with FP filters
+2. Draft Splunk query in queries/H-XXXX.spl with FP filters from H-0022
 3. Execute hunt and document in H-XXXX_YYYY-MM-DD.md
-4. Update vulnerabilities.md with this CVE and hunt status
+4. Compare findings with H-0022 to identify environmental changes
 
 Would you like me to:
 - Create the hunt file (H-XXXX.md)?
-- Draft the Splunk query with safety bounds?
-- Update vulnerabilities.md to track this CVE?
+- Draft the Splunk query with safety bounds and FP filters?
+- Reference the specific lessons from H-0022?
 ```
 
 ---
@@ -298,15 +306,16 @@ Generate hypothesis for PowerShell attacks
 
 **Strong Input:**
 ```
-Generate hypothesis for CVE-2024-1234 affecting PowerShell execution policy bypass.
-We use PowerShell extensively for automation. This is proactive hunt, not incident.
+Generate hypothesis for T1059.001 (PowerShell execution) focusing on suspicious
+encoded command usage. We use PowerShell extensively for automation, so expect
+high false positive rate. This is proactive hunt, not incident.
 ```
 
 ### Specify Hunt Type
 
 Tell the AI:
 - **Proactive:** Routine TTP coverage
-- **Intelligence-driven:** Based on CTI report or CVE
+- **Intelligence-driven:** Based on CTI report or threat intel
 - **Anomaly-driven:** Investigating detected behavior
 - **Incident response:** Active threat requiring immediate action
 
